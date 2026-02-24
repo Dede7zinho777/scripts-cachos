@@ -1,17 +1,24 @@
 -- ===========================================
--- MEU SCRIPT (SEPARADO DA UI)
+-- SCRIPT PRINCIPAL (USA A FLUENT + BOTÃO)
 -- ===========================================
 
--- Carregar a UI (ARQUIVO 1)
+print("🚀 CARREGANDO...")
+
+-- PASSO 1: CARREGAR A FLUENT UI
 local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/main/fluent-ui.lua"))()
 
--- Verificar se a UI carregou
 if not UI then
     warn("❌ Erro ao carregar UI")
     return
 end
 
--- Agora podemos usar a UI no nosso script
+print("✅ UI carregada!")
+
+-- PASSO 2: CARREGAR O BOTÃO
+local Botao = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/main/botao.lua"))()
+print("✅ Botão carregado!")
+
+-- PASSO 3: ACESSAR A UI
 local Fluent = UI.Fluent
 local Tabs = UI.Tabs
 
@@ -22,7 +29,7 @@ do
     -- TOGGLE teste-msg
     local ToggleMsg = Tabs.Teste:AddToggle("teste_msg", {
         Title = "📢 teste-msg",
-        Description = "Ative para testar",
+        Description = "Clique para testar",
         Default = false
     })
 
@@ -45,63 +52,72 @@ do
         end
     end)
 
-    -- BOTÃO de teste
+    -- BOTÃO DE TESTE
     Tabs.Teste:AddButton({
-        Title = "🔔 Botão de Teste",
-        Description = "Clique para testar",
+        Title = "🔔 Botão Teste",
+        Description = "Clique para ver notificação",
         Callback = function()
-            print("✅ Botão clicado!")
             Fluent:Notify({
-                Title = "📨 Teste",
+                Title = "📨 TESTE",
                 Content = "Botão funcionou!",
                 Duration = 3
             })
+            print("✅ Botão clicado!")
         end
     })
 end
 
 -- ===========================================
--- ADICIONAR FUNÇÕES NA ABA MAIN
+-- CRIAR O BOTÃO FLUTUANTE
 -- ===========================================
-do
-    Tabs.Main:AddParagraph({
-        Title = "Bem-vindo!",
-        Content = "Este é meu script personalizado"
-    })
+local MeuBotao = Botao:Criar({
+    Image = "rbxassetid://138340742425851",
+    Tamanho = 70,
+    Posicao = UDim2.new(0, 20, 0, 150)
+})
 
-    Tabs.Main:AddButton({
-        Title = "Informações",
-        Callback = function()
-            print("📊 Script carregado com sucesso!")
-        end
-    })
+-- FUNÇÃO PARA CONTROLAR A UI COM O BOTÃO
+local uiVisivel = true
+local uiScreen = nil
+
+-- Encontrar a ScreenGui da Fluent
+for _, v in pairs(game:GetService("CoreGui"):GetChildren()) do
+    if v.Name == "Fluent" or v.Name:find("Fluent") then
+        uiScreen = v
+        break
+    end
+end
+
+if uiScreen then
+    MeuBotao.MouseButton1Click:Connect(function()
+        uiVisivel = not uiVisivel
+        uiScreen.Enabled = uiVisivel
+        print("Botão clicado! UI " .. (uiVisivel and "aberta" or "fechada"))
+    end)
+else
+    warn("⚠️ Não encontrou a UI, o botão só vai notificar")
+    MeuBotao.MouseButton1Click:Connect(function()
+        print("✅ Botão clicado!")
+        Fluent:Notify({
+            Title = "Botão",
+            Content = "Funcionando!",
+            Duration = 2
+        })
+    end)
 end
 
 -- ===========================================
--- ADICIONAR FUNÇÕES NA ABA SETTINGS
+-- FINALIZAR
 -- ===========================================
-do
-    Tabs.Settings:AddParagraph({
-        Title = "Configurações",
-        Content = "Aqui vão as configurações do script"
-    })
-
-    Tabs.Settings:AddButton({
-        Title = "Reiniciar Script",
-        Callback = function()
-            print("🔄 Reiniciando...")
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/main/meu-script.lua"))()
-        end
-    })
-end
-
--- INICIAR
-UI.Window:SelectTab(1) -- Abre na aba Main
+UI.Window:SelectTab(3) -- Abre na aba TESTE
 
 Fluent:Notify({
-    Title = "✅ Script Carregado!",
-    Content = "Use a aba TESTE",
+    Title = "✅ SCRIPT CARREGADO!",
+    Content = "Use o botão com sua imagem",
     Duration = 4
 })
 
-print("🚀 Script principal carregado!")
+print("🎉 Tudo pronto!")
+print("👉 Botão flutuante com sua imagem")
+print("👉 UI Fluent com abas Main, Settings e TESTE")
+print("👉 Toggle 'teste-msg' na aba TESTE")
