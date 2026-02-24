@@ -1,0 +1,74 @@
+-- ===========================================
+-- SCRIPT SIMPLES COM CATEGORIA TESTE
+-- ===========================================
+
+-- CARREGAR SUA UI DO GITHUB
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/refs/heads/main/ui-library.lua"))()
+
+-- CRIAR O MENU PRINCIPAL
+local Menu = library:CreateWindow('MEU SCRIPT TESTE', {
+    topcolor = Color3.fromRGB(30, 30, 30),        -- Cor do topo
+    underlinecolor = Color3.fromRGB(0, 255, 100), -- Cor da linha (verde)
+    bgcolor = Color3.fromRGB(35, 35, 35)          -- Cor de fundo
+})
+
+-- ===========================================
+-- CATEGORIA: TESTE
+-- ===========================================
+Menu:Section('🔧 TESTE')
+
+-- OPCÃO: teste-msg
+Menu:Toggle('teste-msg', 
+    {flag = "teste_msg", default = false},
+    function(valor)
+        if valor then
+            -- QUANDO ATIVAR
+            
+            -- 1. Mostra no CONSOLE
+            print("🔔 TESTE ATIVADO!")
+            print("📱 Mensagem de teste apareceu!")
+            
+            -- 2. Mostra NOTIFICAÇÃO no canto inferior direito
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "✅ TESTE",
+                Text = "Mensagem de teste ativada!",
+                Duration = 3  -- Fica 3 segundos na tela
+            })
+            
+        else
+            -- QUANDO DESATIVAR
+            
+            -- Mostra no console
+            print("❌ TESTE DESATIVADO!")
+            
+            -- Mostra notificação
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "❌ TESTE",
+                Text = "Mensagem de teste desativada!",
+                Duration = 3
+            })
+        end
+    end
+)
+
+-- BOTÃO EXTRA (opcional, só pra testar)
+Menu:Button('Testar Agora', function()
+    -- Mostra mensagem no console
+    print("🔔 BOTÃO DE TESTE CLICADO!")
+    
+    -- Mostra notificação
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "🔔 BOTÃO",
+        Text = "Você clicou no botão de teste!",
+        Duration = 3
+    })
+end)
+
+-- MENSAGEM INICIAL (quando o script carrega)
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "✅ Script Carregado!",
+    Text = "Categoria TESTE disponível",
+    Duration = 3
+})
+
+print("🚀 Script carregado! Categoria TESTE pronta para uso.")
