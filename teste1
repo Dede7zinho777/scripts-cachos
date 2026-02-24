@@ -1,50 +1,98 @@
 -- ===========================================
--- SCRIPT DE TESTE SIMPLES
--- Apenas notificação e console
+-- SCRIPT DE TESTE SIMPLES (CORRIGIDO)
+-- Usando Orion Library com ID 138340742425851
 -- ===========================================
 
--- CARREGAR A UI CORRETA
+-- CARREGAR ORION LIBRARY
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
 
--- CRIAR JANELA
-local Janela = library:CreateWindow('🧪 TESTE SIMPLES', {
-    topcolor = Color3.fromRGB(30, 30, 30),
-    underlinecolor = Color3.fromRGB(0, 255, 100),
-    bgcolor = Color3.fromRGB(35, 35, 35)
+-- CRIAR JANELA PRINCIPAL
+local Window = OrionLib:MakeWindow({
+    Name = "🧪 SCRIPT DE TESTE",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "TesteConfig",
+    IntroEnabled = false,
+    Icon = "rbxassetid://138340742425851",  -- SEU ID AQUI!
+    CloseCallback = function()
+        print("Janela fechada")
+    end
 })
 
--- CRIAR CATEGORIA
-Janela:Section('🔧 TESTE')
+-- ===========================================
+-- ABA PRINCIPAL
+-- ===========================================
+local Tab = Window:MakeTab({
+    Name = "Testes",
+    Icon = "rbxassetid://138340742425851",  -- SEU ID AQUI!
+    PremiumOnly = false
+})
 
--- OPCÃO TESTE-MSG (IGUAL AO QUE FUNCIONOU)
-Janela:Toggle('teste-msg', 
-    {flag = "teste_msg", default = false},
-    function(valor)
-        if valor then
-            -- ATIVOU
-            print("🔔 TESTE ATIVADO!")  -- Mensagem no console
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "✅ TESTE",
-                Text = "Mensagem de teste ativada!",
-                Duration = 3
+-- ===========================================
+-- SEÇÃO TESTE
+-- ===========================================
+local Section = Tab:AddSection({
+    Name = "🔧 TESTE-MSG"
+})
+
+-- ===========================================
+-- TOGGLE TESTE-MSG (o que você pediu!)
+-- ===========================================
+Tab:AddToggle({
+    Name = "teste-msg",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            -- QUANDO ATIVAR
+            print("🔔 TESTE ATIVADO!")  -- Mensagem no CONSOLE
+            OrionLib:MakeNotification({  -- Mensagem na TELA
+                Name = "✅ TESTE",
+                Content = "Mensagem de teste ativada!",
+                Image = "rbxassetid://138340742425851",
+                Time = 3
             })
         else
-            -- DESATIVOU
-            print("❌ TESTE DESATIVADO!")  -- Mensagem no console
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "❌ TESTE",
-                Text = "Mensagem de teste desativada!",
-                Duration = 3
+            -- QUANDO DESATIVAR
+            print("❌ TESTE DESATIVADO!")  -- Mensagem no CONSOLE
+            OrionLib:MakeNotification({  -- Mensagem na TELA
+                Name = "❌ TESTE",
+                Content = "Mensagem de teste desativada!",
+                Image = "rbxassetid://138340742425851",
+                Time = 3
             })
         end
     end
-)
-
--- NOTIFICAÇÃO INICIAL
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "✅ Script Carregado!",
-    Text = "Categoria TESTE disponível",
-    Duration = 3
 })
 
-print("🚀 Script de teste simples carregado!")
+-- ===========================================
+-- BOTÃO EXTRA PARA TESTAR
+-- ===========================================
+Tab:AddButton({
+    Name = "Testar Notificação",
+    Callback = function()
+        print("✅ Botão clicado!")
+        OrionLib:MakeNotification({
+            Name = "✅ TESTE",
+            Content = "Notificação funcionando!",
+            Image = "rbxassetid://138340742425851",
+            Time = 3
+        })
+    end
+})
+
+-- ===========================================
+-- INICIALIZAR (OBRIGATÓRIO!)
+-- ===========================================
+OrionLib:Init()
+
+-- ===========================================
+-- NOTIFICAÇÃO INICIAL
+-- ===========================================
+OrionLib:MakeNotification({
+    Name = "✅ Script Carregado!",
+    Content = "teste-msg disponível",
+    Image = "rbxassetid://138340742425851",
+    Time = 4
+})
+
+print("🚀 Script de teste carregado com ID 138340742425851!")
