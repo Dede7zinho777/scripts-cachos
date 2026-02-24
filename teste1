@@ -1,32 +1,87 @@
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/refs/heads/main/ui-library.lua"))()
+-- ===========================================
+-- SCRIPT COMPLETO DEFINITIVO
+-- UI + BOTÃO + TESTE-MSG
+-- ===========================================
 
+print("🚀 CARREGANDO SCRIPT DEFINITIVO...")
+
+-- CARREGAR UI
+local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/refs/heads/main/ui-library.lua"))()
+print("✅ UI carregada!")
+
+-- CARREGAR BOTÃO
+local Botao = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/refs/heads/main/botao-flutuante.lua"))()
+print("✅ Botão carregado!")
+
+-- CRIAR JANELA
 local Window = OrionLib:MakeWindow({
-    Name = "Minha Janela",
+    Name = "SCRIPT DEFINITIVO",
     HidePremium = false,
     SaveConfig = false,
     IntroEnabled = true
 })
 
+-- CRIAR ABA
 local Tab = Window:MakeTab({
-    Name = "Teste",
+    Name = "Principal",
     Icon = "rbxassetid://6031280882"
 })
 
+-- ADICIONAR TOGGLE TESTE-MSG
 Tab:AddToggle({
     Name = "teste-msg",
     Default = false,
     Callback = function(Value)
         if Value then
-            print("ATIVADO")
+            print("🟢 TESTE ATIVADO!")
             OrionLib:MakeNotification({
-                Name = "Teste",
-                Content = "Ativado!",
+                Name = "✅ ATIVADO",
+                Content = "Mensagem de teste ativada!",
+                Image = "rbxassetid://6031280882",
                 Time = 3
             })
         else
-            print("DESATIVADO")
+            print("🔴 TESTE DESATIVADO!")
+            OrionLib:MakeNotification({
+                Name = "❌ DESATIVADO",
+                Content = "Mensagem desativada!",
+                Image = "rbxassetid://6031280882",
+                Time = 3
+            })
         end
     end
 })
 
+-- ADICIONAR BOTÃO DE TESTE
+Tab:AddButton({
+    Name = "Testar Notificação",
+    Callback = function()
+        OrionLib:MakeNotification({
+            Name = "📨 TESTE",
+            Content = "Botão funcionando!",
+            Image = "rbxassetid://6031280882",
+            Time = 3
+        })
+    end
+})
+
+-- INICIALIZAR UI
 OrionLib:Init()
+
+-- CRIAR BOTÃO FLUTUANTE
+local MeuBotao = Botao:Criar({
+    Image = "rbxassetid://138340742425851",  -- SUA IMAGEM
+    Tamanho = 70,
+    Posicao = UDim2.new(0, 30, 0, 200),
+    Arrastavel = true,
+    UIAlvo = "Orion",
+    AoClick = function(estado)
+        print("Botão clicado! UI " .. (estado and "aberta" or "fechada"))
+    end
+})
+
+print("🎉 TUDO PRONTO!")
+print("👉 Botão com sua imagem no canto superior esquerdo")
+print("👉 UI no centro da tela")
+print("👉 Clique no botão para abrir/fechar a UI")
+print("👉 Use o toggle 'teste-msg' dentro da UI")
