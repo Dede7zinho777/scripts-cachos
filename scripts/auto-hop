@@ -1,0 +1,275 @@
+-- ===========================================
+-- MEU SCRIPT (COM ABA AUTO HOP)
+-- ===========================================
+
+print("🚀 Carregando script...")
+
+-- Carregar a UI
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/main/fluent-base.lua"))()
+
+if not UI then
+    warn("❌ Erro ao carregar UI")
+    return
+end
+
+-- Acessar componentes da UI
+local Fluent = UI.Fluent
+local Tabs = UI.Tabs
+local Options = UI.Options
+
+-- ===========================================
+-- CRIAR NOVA ABA "AUTO HOP"
+-- ===========================================
+Tabs.AutoHop = UI.Window:AddTab({ Title = "Auto Hop", Icon = "rotate-cw" })
+
+-- ===========================================
+-- CONTEÚDO DA ABA AUTO HOP
+-- ===========================================
+do
+    -- VARIÁVEIS DE CONTROLE
+    local autoHopAtivo = false
+    local tempoSegundos = 120 -- valor padrão
+    local loopConnection = nil
+    
+    -- ===========================================
+    -- FUNÇÃO PRINCIPAL DO AUTO HOP
+    -- ===========================================
+    local function executarAutoHop()
+        while autoHopAtivo do
+            print("🔄 Auto Hop: Procurando novo servidor...")
+            
+            -- Notificação
+            Fluent:Notify({
+                Title = "🌐 Auto Hop",
+                Content = "Procurando servidor...",
+                Duration = 2
+            })
+            
+            -- FUNÇÃO DE SERVER HOP (adaptada)
+            local function pularServidor()
+                local PlaceID = game.PlaceId
+                local success, result = pcall(function()
+                    local response = game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100')
+                    local data = game:GetService('HttpService'):JSONDecode(response)
+                    
+                    for _, servidor in pairs(data.data) do
+                        if servidor.playing < servidor.maxPlayers then
+                            return servidor.id
+                        end
+                    end
+                    return nil
+                end)
+                
+                if success and result then
+                    game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, result, game.Players.LocalPlayer)
+                    return true
+                else
+                    return false
+                end
+            end
+            
+            local encontrou = pularServidor()
+            
+            if encontrou then
+                print("✅ Auto Hop: Servidor encontrado! Teleportando...")
+                autoHopAtivo = false -- Para o loop após teleportar
+                break
+            else
+                print("⚠️ Auto Hop: Nenhum servidor disponível, tentando novamente em " .. tempoSegundos .. " segundos")
+                Fluent:Notify({
+                    Title = "⚠️ Auto Hop",
+                    Content = "Nenhum servidor. Tentando novamente em " .. tempoSegundos .. "s",
+                    Duration = 3
+                })
+            end
+            
+            -- Aguardar o tempo configurado
+            local tempoRestante = tempoSegundos
+            while tempoRestante > 0 and autoHopAtivo do
+                wait(1)
+                tempoRestante = tempoRestante - 1
+            end
+        end
+    end
+    
+    -- ===========================================
+    -- 1. TOGGLE PARA ATIVAR/DESATIVAR
+    -- ===========================================
+    Tabs.AutoHop:AddToggle("autoHop_toggle", {
+        Title = "⚡ Auto Hop",
+        Description = "Ative para começar a trocar de servidor automaticamente",
+        Default = false
+    }):OnChanged(function(valor)
+        autoHopAtivo = valor
+        
+        if valor then
+            print("🟢 Auto Hop ATIVADO! Intervalo: " .. tempoSegundos .. " segundos")
+            Fluent:Notify({
+                Title = "✅ Auto Hop Ativado",
+                Content = "Trocando de servidor a cada " .. tempoSegundos .. "s",
+                Duration = 4
+            })
+            -- Iniciar em thread separada
+            task.spawn(executarAutoHop)
+        else
+            print("🔴 Auto Hop DESATIVADO!")
+            Fluent:Notify({
+                Title = "❌ Auto Hop Desativado",
+                Content = "Processo interrompido",
+                Duration = 3
+            })
+        end
+    end)
+    
+    -- ===========================================
+    -- 2. INPUT PARA CONFIGURAR O TEMPO
+    -- ===========================================
+    Tabs.AutoHop:AddInput("tempo_input", {
+        Title = "⏱️ Intervalo (segundos)",
+        Description = "Digite o tempo entre cada troca de servidor",
+        Default = tostring(tempoSegundos),
+        Placeholder = "Ex: 120",
+        Numeric = true, -- Só aceita números
+        Callback = function(valor)
+            local novoValor = tonumber(valor)
+            if novoValor and novoValor > 0 then
+                tempoSegundos = novoValor
+                print("⏱️ Intervalo alterado para: " .. tempoSegundos .. " segundos")
+                Fluent:Notify({
+                    Title = "⏱️ Intervalo Atualizado",
+                    Content = "Auto Hop trocará a cada " .. tempoSegundos .. "s",
+                    Duration = 3
+                })
+            else
+                Fluent:Notify({
+                    Title = "⚠️ Valor Inválido",
+                    Content = "Digite um número maior que 0",
+                    Duration = 3
+                })
+            end
+        end
+    })
+    
+    -- ===========================================
+    -- 3. BOTÃO PARA TESTAR MANUALMENTE
+    -- ===========================================
+    Tabs.AutoHop:AddButton({
+        Title = "🚀 Pular Servidor Agora",
+        Description = "Executa o Auto Hop uma única vez",
+        Callback = function()
+            print("🔄 Pulando servidor manualmente...")
+            Fluent:Notify({
+                Title = "🚀 Auto Hop Manual",
+                Content = "Procurando servidor...",
+                Duration = 3
+            })
+            
+            -- Executar uma vez
+            task.spawn(function()
+                local function pularAgora()
+                    local PlaceID = game.PlaceId
+                    local response = game:HttpGet('https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Asc&limit=100')
+                    local data = game:GetService('HttpService'):JSONDecode(response)
+                    
+                    for _, servidor in pairs(data.data) do
+                        if servidor.playing < servidor.maxPlayers then
+                            game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, servidor.id, game.Players.LocalPlayer)
+                            return true
+                        end
+                    end
+                    return false
+                end
+                
+                local encontrou = pcall(pularAgora)
+                if not encontrou then
+                    Fluent:Notify({
+                        Title = "❌ Erro",
+                        Content = "Nenhum servidor disponível no momento",
+                        Duration = 3
+                    })
+                end
+            end)
+        end
+    })
+    
+    -- ===========================================
+    -- 4. TEXTO INFORMATIVO (OPCIONAL)
+    -- ===========================================
+    Tabs.AutoHop:AddParagraph({
+        Title = "ℹ️ Como funciona",
+        Content = "1. Ative o toggle para iniciar\n2. Configure o intervalo em segundos\n3. O Auto Hop trocará automaticamente\n4. Use o botão para testar manualmente"
+    })
+end
+
+-- ===========================================
+-- CONTEÚDO DA ABA TESTE (já existente)
+-- ===========================================
+do
+    -- Toggle "teste-msg"
+    local ToggleMsg = Tabs.Teste:AddToggle("teste_msg", {
+        Title = "📢 teste-msg",
+        Description = "Ative para ver a mensagem de teste",
+        Default = false
+    })
+
+    ToggleMsg:OnChanged(function()
+        local valor = Options.teste_msg.Value
+        if valor then
+            print("🟢 TESTE ATIVADO!")
+            Fluent:Notify({
+                Title = "✅ TESTE",
+                Content = "Mensagem de teste ativada!",
+                Duration = 3
+            })
+        else
+            print("🔴 TESTE DESATIVADO!")
+            Fluent:Notify({
+                Title = "❌ TESTE",
+                Content = "Mensagem de teste desativada!",
+                Duration = 3
+            })
+        end
+    end)
+
+    -- Botão de teste
+    Tabs.Teste:AddButton({
+        Title = "🔔 Botão de Teste",
+        Description = "Clique para testar",
+        Callback = function()
+            print("✅ Botão clicado!")
+            Fluent:Notify({
+                Title = "📨 TESTE",
+                Content = "Botão funcionou!",
+                Duration = 3
+            })
+        end
+    })
+end
+
+-- ===========================================
+-- CONTEÚDO DA ABA MAIN
+-- ===========================================
+do
+    Tabs.Main:AddParagraph({
+        Title = "Bem-vindo!",
+        Content = "Este é meu script personalizado\nUse a aba Auto Hop para configurações"
+    })
+end
+
+-- ===========================================
+-- INICIAR TUDO
+-- ===========================================
+UI.Window:SelectTab(4) -- Abre na aba Auto Hop (1=Main,2=Settings,3=Teste,4=AutoHop)
+
+Fluent:Notify({
+    Title = "✅ Script Carregado!",
+    Content = "Aba Auto Hop adicionada",
+    Duration = 4
+})
+
+print("🎉 Script carregado com sucesso!")
+print("📌 Novas abas: Main, Settings, TESTE, Auto Hop")
+print("📌 Na aba Auto Hop: Toggle + Input de tempo + Botão")
+
+-- Carregar configurações salvas
+UI.SaveManager:LoadAutoloadConfig()
