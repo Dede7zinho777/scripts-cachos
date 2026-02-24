@@ -1,74 +1,200 @@
 -- ===========================================
--- SCRIPT SIMPLES COM CATEGORIA TESTE
+-- SCRIPT DE TESTE PARA UI-LIBRARY
+-- By: Dede7zinho777
 -- ===========================================
 
 -- CARREGAR SUA UI DO GITHUB
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/refs/heads/main/ui-library.lua"))()
 
--- CRIAR O MENU PRINCIPAL
-local Menu = library:CreateWindow('MEU SCRIPT TESTE', {
-    topcolor = Color3.fromRGB(30, 30, 30),        -- Cor do topo
-    underlinecolor = Color3.fromRGB(0, 255, 100), -- Cor da linha (verde)
-    bgcolor = Color3.fromRGB(35, 35, 35)          -- Cor de fundo
+-- ===========================================
+-- CRIAR JANELA PRINCIPAL
+-- ===========================================
+local Janela = library:CreateWindow('🧪 SCRIPT DE TESTE', {
+    topcolor = Color3.fromRGB(25, 25, 25),
+    underlinecolor = Color3.fromRGB(0, 255, 200),
+    bgcolor = Color3.fromRGB(30, 30, 30)
 })
 
 -- ===========================================
--- CATEGORIA: TESTE
+-- ABA 1: TESTES BÁSICOS
 -- ===========================================
-Menu:Section('🔧 TESTE')
+Janela:Section('📋 TESTES BÁSICOS')
 
--- OPCÃO: teste-msg
-Menu:Toggle('teste-msg', 
-    {flag = "teste_msg", default = false},
+-- 1. BOTÃO SIMPLES
+Janela:Button('🔘 Clique Aqui', function()
+    print("✅ Botão clicado!")
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "✅ Teste",
+        Text = "Botão funcionou!",
+        Duration = 2
+    })
+end)
+
+-- 2. TOGGLE COM NOTIFICAÇÃO
+Janela:Toggle('📢 Notificação Teste', 
+    {flag = "notif_toggle", default = false},
     function(valor)
         if valor then
-            -- QUANDO ATIVAR
-            
-            -- 1. Mostra no CONSOLE
-            print("🔔 TESTE ATIVADO!")
-            print("📱 Mensagem de teste apareceu!")
-            
-            -- 2. Mostra NOTIFICAÇÃO no canto inferior direito
+            print("🔔 Notificações ativadas")
             game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "✅ TESTE",
-                Text = "Mensagem de teste ativada!",
-                Duration = 3  -- Fica 3 segundos na tela
+                Title = "🔔 Ativado",
+                Text = "Você ativou as notificações!",
+                Duration = 2
             })
-            
         else
-            -- QUANDO DESATIVAR
-            
-            -- Mostra no console
-            print("❌ TESTE DESATIVADO!")
-            
-            -- Mostra notificação
-            game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "❌ TESTE",
-                Text = "Mensagem de teste desativada!",
-                Duration = 3
-            })
+            print("🔕 Notificações desativadas")
         end
     end
 )
 
--- BOTÃO EXTRA (opcional, só pra testar)
-Menu:Button('Testar Agora', function()
-    -- Mostra mensagem no console
-    print("🔔 BOTÃO DE TESTE CLICADO!")
+-- 3. SLIDER DE VELOCIDADE
+Janela:Slider('⚡ Velocidade do Jogador', 
+    {
+        flag = "speed_slider",
+        min = 16,
+        max = 250,
+        default = 16
+    },
+    function(valor)
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.WalkSpeed = valor
+            print("🎚️ Velocidade: " .. valor)
+        end
+    end
+)
+
+-- ===========================================
+-- ABA 2: CONTROLES DO JOGADOR
+-- ===========================================
+Janela:Section('👤 CONTROLES DO JOGADOR')
+
+-- 4. DROPDOWN PARA ESCOLHER PARTE DO CORPO
+Janela:Dropdown('🎯 Parte do Corpo',
+    {
+        flag = "body_part",
+        list = {"Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg"}
+    },
+    function(valor)
+        print("👆 Parte selecionada: " .. valor)
+    end
+)
+
+-- 5. TOGGLE PARA VOAR
+Janela:Toggle('🦅 Modo Voo', 
+    {flag = "fly_toggle", default = false},
+    function(valor)
+        local player = game.Players.LocalPlayer
+        if valor then
+            print("🦅 Voo ativado!")
+            spawn(function()
+                while library.flags.fly_toggle do
+                    wait(0.1)
+                    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                        local camera = workspace.CurrentCamera
+                        player.Character.HumanoidRootPart.Velocity = camera.CFrame.LookVector * 50
+                    end
+                end
+            end)
+        else
+            print("🦅 Voo desativado")
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                player.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
+            end
+        end
+    end
+)
+
+-- 6. SLIDER DE PULO
+Janela:Slider('🦘 Altura do Pulo', 
+    {
+        flag = "jump_slider",
+        min = 50,
+        max = 200,
+        default = 50
+    },
+    function(valor)
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:FindFirstChild("Humanoid") then
+            player.Character.Humanoid.JumpPower = valor
+            print("🎚️ Pulo: " .. valor)
+        end
+    end
+)
+
+-- ===========================================
+-- ABA 3: DIVERSOS
+-- ===========================================
+Janela:Section('🎲 DIVERSOS')
+
+-- 7. BOTÃO DE RESET
+Janela:Button('🔄 Resetar Jogador', function()
+    local player = game.Players.LocalPlayer
+    if player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.Health = 0
+        wait(2)
+        player.Character.Humanoid.Health = 100
+        print("🔄 Jogador resetado!")
+    end
+end)
+
+-- 8. BOTÃO PARA VER INFO
+Janela:Button('ℹ️ Informações', function()
+    local info = string.format([[
+    📊 INFORMAÇÕES:
+    Jogador: %s
+    ID: %s
+    Ping: %dms
+    ]],
+    game.Players.LocalPlayer.Name,
+    game.Players.LocalPlayer.UserId,
+    game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue())
     
-    -- Mostra notificação
+    print(info)
     game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "🔔 BOTÃO",
-        Text = "Você clicou no botão de teste!",
+        Title = "ℹ️ Info",
+        Text = "Informações no console!",
         Duration = 3
     })
 end)
 
--- MENSAGEM INICIAL (quando o script carrega)
+-- 9. TOGGLE PARA ESP (simples)
+Janela:Toggle('👁️ ESP Simples', 
+    {flag = "esp_toggle", default = false},
+    function(valor)
+        if valor then
+            print("👁️ ESP ativado")
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Parent = player.Character
+                    highlight.FillColor = Color3.new(1,0,0)
+                    highlight.OutlineColor = Color3.new(1,1,1)
+                end
+            end
+        else
+            print("👁️ ESP desativado")
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player.Character then
+                    for _, highlight in pairs(player.Character:GetChildren()) do
+                        if highlight:IsA("Highlight") then
+                            highlight:Destroy()
+                        end
+                    end
+                end
+            end
+        end
+    end
+)
+
+-- ===========================================
+-- NOTIFICAÇÃO INICIAL
+-- ===========================================
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "✅ Script Carregado!",
-    Text = "Categoria TESTE disponível",
+    Title = "✅ Script de Teste",
+    Text = "Todas as funções carregadas!",
     Duration = 3
 })
 
-print("🚀 Script carregado! Categoria TESTE pronta para uso.")
+print("🚀 Script de teste carregado!")
+print("📋 Teste todas as funções da UI!")
