@@ -1,87 +1,107 @@
 -- ===========================================
--- SCRIPT COMPLETO DEFINITIVO
--- UI + BOTÃO + TESTE-MSG
+-- MEU SCRIPT (SEPARADO DA UI)
 -- ===========================================
 
-print("🚀 CARREGANDO SCRIPT DEFINITIVO...")
+-- Carregar a UI (ARQUIVO 1)
+local UI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/main/fluent-ui.lua"))()
 
--- CARREGAR UI
-local OrionLib = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/refs/heads/main/ui-library.lua"))()
-print("✅ UI carregada!")
+-- Verificar se a UI carregou
+if not UI then
+    warn("❌ Erro ao carregar UI")
+    return
+end
 
--- CARREGAR BOTÃO
-local Botao = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/refs/heads/main/botao-flutuante.lua"))()
-print("✅ Botão carregado!")
+-- Agora podemos usar a UI no nosso script
+local Fluent = UI.Fluent
+local Tabs = UI.Tabs
 
--- CRIAR JANELA
-local Window = OrionLib:MakeWindow({
-    Name = "SCRIPT DEFINITIVO",
-    HidePremium = false,
-    SaveConfig = false,
-    IntroEnabled = true
-})
+-- ===========================================
+-- ADICIONAR FUNÇÕES NA ABA TESTE
+-- ===========================================
+do
+    -- TOGGLE teste-msg
+    local ToggleMsg = Tabs.Teste:AddToggle("teste_msg", {
+        Title = "📢 teste-msg",
+        Description = "Ative para testar",
+        Default = false
+    })
 
--- CRIAR ABA
-local Tab = Window:MakeTab({
-    Name = "Principal",
-    Icon = "rbxassetid://6031280882"
-})
-
--- ADICIONAR TOGGLE TESTE-MSG
-Tab:AddToggle({
-    Name = "teste-msg",
-    Default = false,
-    Callback = function(Value)
-        if Value then
+    ToggleMsg:OnChanged(function()
+        local valor = Fluent.Options.teste_msg.Value
+        if valor then
             print("🟢 TESTE ATIVADO!")
-            OrionLib:MakeNotification({
-                Name = "✅ ATIVADO",
-                Content = "Mensagem de teste ativada!",
-                Image = "rbxassetid://6031280882",
-                Time = 3
+            Fluent:Notify({
+                Title = "✅ TESTE",
+                Content = "Mensagem ativada!",
+                Duration = 3
             })
         else
             print("🔴 TESTE DESATIVADO!")
-            OrionLib:MakeNotification({
-                Name = "❌ DESATIVADO",
+            Fluent:Notify({
+                Title = "❌ TESTE",
                 Content = "Mensagem desativada!",
-                Image = "rbxassetid://6031280882",
-                Time = 3
+                Duration = 3
             })
         end
-    end
+    end)
+
+    -- BOTÃO de teste
+    Tabs.Teste:AddButton({
+        Title = "🔔 Botão de Teste",
+        Description = "Clique para testar",
+        Callback = function()
+            print("✅ Botão clicado!")
+            Fluent:Notify({
+                Title = "📨 Teste",
+                Content = "Botão funcionou!",
+                Duration = 3
+            })
+        end
+    })
+end
+
+-- ===========================================
+-- ADICIONAR FUNÇÕES NA ABA MAIN
+-- ===========================================
+do
+    Tabs.Main:AddParagraph({
+        Title = "Bem-vindo!",
+        Content = "Este é meu script personalizado"
+    })
+
+    Tabs.Main:AddButton({
+        Title = "Informações",
+        Callback = function()
+            print("📊 Script carregado com sucesso!")
+        end
+    })
+end
+
+-- ===========================================
+-- ADICIONAR FUNÇÕES NA ABA SETTINGS
+-- ===========================================
+do
+    Tabs.Settings:AddParagraph({
+        Title = "Configurações",
+        Content = "Aqui vão as configurações do script"
+    })
+
+    Tabs.Settings:AddButton({
+        Title = "Reiniciar Script",
+        Callback = function()
+            print("🔄 Reiniciando...")
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Dede7zinho777/ui-lib/main/meu-script.lua"))()
+        end
+    })
+end
+
+-- INICIAR
+UI.Window:SelectTab(1) -- Abre na aba Main
+
+Fluent:Notify({
+    Title = "✅ Script Carregado!",
+    Content = "Use a aba TESTE",
+    Duration = 4
 })
 
--- ADICIONAR BOTÃO DE TESTE
-Tab:AddButton({
-    Name = "Testar Notificação",
-    Callback = function()
-        OrionLib:MakeNotification({
-            Name = "📨 TESTE",
-            Content = "Botão funcionando!",
-            Image = "rbxassetid://6031280882",
-            Time = 3
-        })
-    end
-})
-
--- INICIALIZAR UI
-OrionLib:Init()
-
--- CRIAR BOTÃO FLUTUANTE
-local MeuBotao = Botao:Criar({
-    Image = "rbxassetid://138340742425851",  -- SUA IMAGEM
-    Tamanho = 70,
-    Posicao = UDim2.new(0, 30, 0, 200),
-    Arrastavel = true,
-    UIAlvo = "Orion",
-    AoClick = function(estado)
-        print("Botão clicado! UI " .. (estado and "aberta" or "fechada"))
-    end
-})
-
-print("🎉 TUDO PRONTO!")
-print("👉 Botão com sua imagem no canto superior esquerdo")
-print("👉 UI no centro da tela")
-print("👉 Clique no botão para abrir/fechar a UI")
-print("👉 Use o toggle 'teste-msg' dentro da UI")
+print("🚀 Script principal carregado!")
